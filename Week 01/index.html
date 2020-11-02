@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .board {
+
+        }
+
+        .cell {
+            display: inline-block;
+
+            width: 100px;
+            height: 100px;
+            border: 1px solid black;
+
+            line-height: 100px;
+            vertical-align: middle;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div id="board"></div>
+<script>
+    // setup
+    const COLOR = {
+        EMPTY: 0,
+        O: -1,
+        X: 1,
+    }
+    const SIZE = 3
+
+    // init data
+    let color = COLOR.O
+    const pattern = [
+        0, 1, 1,
+        0, 0, 0,
+        0, 0, 0,
+    ]
+
+
+    // helper function
+    const getIndex = (function (size) {
+        return function (x, y) {
+            return size * y + x
+        }
+    })(SIZE)
+
+    function getColor(x, y) {
+        const index = getIndex(x, y)
+
+        return pattern[index] == COLOR.O ? "O" :
+            pattern[index] == COLOR.X ? "X" : ""
+    }
+
+    function switchPlayer() {
+        color = -color
+    }
+
+    function show() {
+        const board = document.getElementById("board")
+        board.innerHTML =''
+
+        for (let y = 0; y < SIZE; y++) {
+            for (let x = 0; x < SIZE; x++) {
+                const cell = document.createElement("div")
+                cell.classList.add("cell")
+
+                cell.innerText = getColor(x,y)
+
+                cell.addEventListener('click', () => {
+                    move(x, y)
+                })
+                board.appendChild(cell)
+            }
+            board.appendChild(document.createElement("br"))
+        }
+    }
+
+    function move(x, y) {
+        if(getColor(x,y)!=="")return
+        pattern[getIndex(x, y)] = color
+        switchPlayer()
+        show()
+    }
+
+    function check(){
+
+    }
+
+    show()
+
+
+</script>
+</body>
+</html>
