@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"/>
     <title>Title</title>
     <style>
         .board {
-
         }
 
         .cell {
@@ -28,71 +27,135 @@
     const COLOR = {
         EMPTY: 0,
         O: -1,
-        X: 1,
-    }
-    const SIZE = 3
+        X: 1
+    };
+    const SIZE = 3;
 
     // init data
-    let color = COLOR.O
-    const pattern = [
-        0, 1, 1,
-        0, 0, 0,
-        0, 0, 0,
-    ]
-
+    let color = COLOR.O;
+    const pattern = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 
     // helper function
     const getIndex = (function (size) {
         return function (x, y) {
-            return size * y + x
-        }
-    })(SIZE)
-
-    function getColor(x, y) {
-        const index = getIndex(x, y)
-
-        return pattern[index] == COLOR.O ? "O" :
-            pattern[index] == COLOR.X ? "X" : ""
-    }
+            return size * y + x;
+        };
+    })(SIZE);
 
     function switchPlayer() {
-        color = -color
+        color = -color;
+        console.log(`目前玩家是:${color === COLOR.O ? "O" : "X"}`)
+    }
+
+    function getColor(pattern, x, y) {
+        return pattern[getIndex(x, y)];
+    }
+
+    function clone(pattern) {
+        // return JSON.parse(JSON.stringify(pattern));
+        return Object.create(pattern);
+    }
+
+    function willWin(pattern, color) {
+        for (let x = 0; x < SIZE; x++) {
+            for (let y = 0; y < SIZE; y++) {
+                if (getColor(pattern, x, y) !== COLOR.EMPTY) continue;
+
+                const tmpPattern = clone(pattern);
+                move(tmpPattern, x, y);
+                if (check(tmpPattern, color)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     function show() {
-        const board = document.getElementById("board")
-        board.innerHTML =''
+        const board = document.getElementById("board");
+        board.innerHTML = "";
 
         for (let y = 0; y < SIZE; y++) {
             for (let x = 0; x < SIZE; x++) {
-                const cell = document.createElement("div")
-                cell.classList.add("cell")
+                const cell = document.createElement("div");
+                cell.classList.add("cell");
 
-                cell.innerText = getColor(x,y)
+                let tmpColor = getColor(pattern, x, y);
+                cell.innerText =
+                    tmpColor == COLOR.O ? "O" : tmpColor == COLOR.X ? "X" : "";
 
-                cell.addEventListener('click', () => {
-                    move(x, y)
-                })
-                board.appendChild(cell)
+                cell.addEventListener("click", () => {
+                    move(pattern, x, y);
+                    if (check(pattern, color)) {
+                        alert(color === COLOR.O ? "O win" : "X win");
+                    }
+                    show();
+                    switchPlayer();
+                    if (willWin(pattern, color)) {
+                        console.log(color === COLOR.O ? "O will win" : "X will win");
+                    }
+                });
+                board.appendChild(cell);
             }
-            board.appendChild(document.createElement("br"))
+            board.appendChild(document.createElement("br"));
         }
     }
 
-    function move(x, y) {
-        if(getColor(x,y)!=="")return
-        pattern[getIndex(x, y)] = color
-        switchPlayer()
-        show()
+    function move(pattern, x, y) {
+        if (getColor(pattern, x, y) !== COLOR.EMPTY) return;
+        pattern[getIndex(x, y)] = color;
     }
 
-    function check(){
+    function check(pattern, color) {
+        // row
+        for (let y = 0; y < SIZE; y++) {
+            let win = true;
+            for (let x = 0; x < SIZE; x++) {
+                if (getColor(pattern, x, y) !== color) {
+                    win = false;
+                    break;
+                }
+            }
+            if (win) return true;
+        }
 
+        // column
+        for (let x = 0; x < SIZE; x++) {
+            let win = true;
+            for (let y = 0; y < SIZE; y++) {
+                if (getColor(pattern, x, y) !== color) {
+                    win = false;
+                    break;
+                }
+            }
+            if (win) return true;
+        }
+
+        //
+        {
+            let win = true;
+            for (let i = 0; i < SIZE; i++) {
+                if (getColor(pattern, i, i) !== color) {
+                    win = false;
+                    break;
+                }
+            }
+            if (win) return true;
+        }
+        {
+            let win = true;
+            for (let i = SIZE - 1; i >= 0; i--) {
+                if (getColor(pattern, i, i) !== color) {
+                    win = false;
+                    break;
+                }
+            }
+            if (win) return true;
+        }
+        return false;
     }
 
-    show()
-
-
+    show();
 </script>
 </body>
 </html>
