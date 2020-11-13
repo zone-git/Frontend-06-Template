@@ -26,8 +26,8 @@
     // setup
     const COLOR = {
         EMPTY: 0,
-        O: -1,
-        X: 1
+        O: 1,
+        X: 2
     };
     const SIZE = 3;
 
@@ -43,7 +43,7 @@
     })(SIZE);
 
     function switchPlayer() {
-        color = -color;
+        color = 3-color;
         console.log(`目前玩家是:${color === COLOR.O ? "O" : "X"}`)
     }
 
