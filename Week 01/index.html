@@ -46,10 +46,12 @@
             return size * y + x;
         };
     })(SIZE);
-
+function showPlayerInfo(){
+    console.log(`目前玩家是:${color === COLOR.O ? "O" : "X"}`)
+}
     function switchPlayer() {
         color = 3-color;
-        console.log(`目前玩家是:${color === COLOR.O ? "O" : "X"}`)
+        showPlayerInfo()
     }
 
     function getColor(pattern, x, y) {
@@ -105,6 +107,32 @@
         }
     }
 
+    function userMove(x, y) {
+        move(pattern, x, y,color);
+        show();
+        if (check(pattern, color)) {
+            alert(color === COLOR.O ? "O win" : "X win");
+        }
+        computerMove()
+    }
+    function computerMove(){
+        switchPlayer();
+        let b=bestChoice(pattern,color)
+        if(b.point){
+            const x=b.point[0]
+            const y=b.point[1]
+            console.log(`最好的結果是:${b.result==RESULT.WIN?"贏":b.result==RESULT.LOSE?"輸":"和"}, 下的地方是:${x},${y}`)
+            if (willWin(pattern, color)) {
+                console.log(color === COLOR.O ? "O will win" : "X will win");
+            }
+            move(pattern,x,y,color)
+            show()
+            switchPlayer();
+        }else{
+            console.log("no place can choose")
+        }
+    }
+
     function show() {
         const board = document.getElementById("board");
         board.innerHTML = "";
@@ -119,18 +147,8 @@
                     tmpColor == COLOR.O ? "O" : tmpColor == COLOR.X ? "X" : "";
 
                 cell.addEventListener("click", () => {
-                    move(pattern, x, y,color);
-                    if (check(pattern, color)) {
-                        alert(color === COLOR.O ? "O win" : "X win");
-                    }
-                    show();
-                    switchPlayer();
-                    let b=bestChoice(pattern,color)
-                    console.log(`最好的結果是:${b.result==RESULT.WIN?"贏":b.result==RESULT.LOSE?"輸":"和"}, 建議下的地方是:${b.point}
-                    `)
-                    if (willWin(pattern, color)) {
-                        console.log(color === COLOR.O ? "O will win" : "X will win");
-                    }
+                    userMove(x,y)
+
                 });
                 board.appendChild(cell);
             }
@@ -193,6 +211,7 @@
     }
 
     show();
+    showPlayerInfo()
 </script>
 </body>
 </html>
