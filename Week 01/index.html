@@ -144,8 +144,8 @@
         }
         {
             let win = true;
-            for (let i = SIZE - 1; i >= 0; i--) {
-                if (getColor(pattern, i, i) !== color) {
+            for (let i =0; i <SIZE; i++) {
+                if (getColor(pattern, SIZE-i-1, i) !== color) {
                     win = false;
                     break;
                 }
