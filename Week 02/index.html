@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Week02</title>
+  <style>
+      .cell {
+          line-height: 7px;
+          width: 6px;
+          height: 6px;
+          vertical-align: top;
+          border: 1px grey solid;
+          box-sizing: border-box;
+      }
+
+      .container {
+          width:600px;
+          display: flex;
+          flex-wrap: wrap;
+      }
+
+  </style>
+</head>
+<body>
+<div class="container" id="container"></div>
+<button id="btn">Save</button>
+<script>
+  // config
+  const SIZE = 100
+  const map = []
+  const CELL_TYPE = {
+    WALL: 1,
+    GROUND: 0,
+  }
+
+  // helper
+  function getElement(id) {
+    return document.getElementById(id)
+  }
+
+  const getIndex = (function (size) {
+    return function (x, y) {
+      return y * size + x
+    }
+  })(100)
+
+  // 寫死 map 陣列
+  function getCellType(x, y) {
+    return map[getIndex(x, y)]
+  }
+
+  const saveBtn = getElement("btn")
+  const container = getElement("container")
+
+  // 編輯器操作狀態
+  let isMouseDown = false
+  document.addEventListener("mouseup",()=>{
+    isMouseDown=false
+  })
+
+  let isClear=false
+  document.addEventListener("mousedown",e=>{
+    isMouseDown=true
+    isClear= e.which===3
+  })
+  document.addEventListener("contextmenu",e=>{
+    e.preventDefault()
+  })
+
+  function initMap() {
+    for (let y = 0; y < SIZE; y++) {
+      for (let x = 0; x < SIZE; x++) {
+        const cell = document.createElement("div")
+        cell.classList.add("cell")
+
+        if (map[getIndex(x, y)] === CELL_TYPE.WALL) {
+          cell.style.backgroundColor = "black"
+        }else if(map[getIndex(x,y)]===CELL_TYPE.GROUND){
+          cell.style.backgroundColor="white"
+        }
+
+        cell.addEventListener("mousemove", () => {
+          if (isMouseDown) {
+            if (isClear) {
+              cell.style.backgroundColor = "white"
+            }else{
+              cell.style.backgroundColor="black"
+            }
+          }
+        })
+
+        container.appendChild(cell)
+      }
+    }
+  }
+
+  initMap()
+</script>
+</body>
+</html>
