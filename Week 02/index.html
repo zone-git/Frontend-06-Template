@@ -27,11 +27,12 @@
 <script>
   // config
   const SIZE = 100
-  const map = []
   const CELL_TYPE = {
+    WALK:2,
     WALL: 1,
     GROUND: 0,
   }
+  const map = localStorage["map"]?JSON.parse(localStorage["map"]):Array(SIZE*SIZE).fill(CELL_TYPE.GROUND)
 
   // helper
   function getElement(id) {
@@ -91,6 +92,27 @@
 
         container.appendChild(cell)
       }
+    }
+  }
+
+  function path(map,start,end){
+    const queue=[start]
+    function insert(x,y){
+      if(x<0||x>=100||y<0||y>=100) return
+      if(map[getIndex(x,y)]===CELL_TYPE.GROUND){
+        map[getIndex(x,y)]=CELL_TYPE.WALK
+        queue.push([x,y])
+      }
+    }
+
+    while(queue.length){
+      const [x,y]=queue.shift()
+      console.log(x, y);
+      if(x===end[0]&&y===end[1])return true
+      insert(x-1,y)
+      insert(x+1,y)
+      insert(x,y-1)
+      insert(x,y+1)
     }
   }
 
