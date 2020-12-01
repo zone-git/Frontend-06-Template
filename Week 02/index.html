@@ -50,6 +50,12 @@
     return map[getIndex(x, y)]
   }
 
+  function sleep(delay) {
+    return new Promise(resolve => {
+      setTimeout(resolve, delay)
+    })
+  }
+
   const saveBtn = getElement("btn")
   const container = getElement("container")
 
@@ -82,10 +88,13 @@
 
         cell.addEventListener("mousemove", () => {
           if (isMouseDown) {
+            const index=getIndex(x,y)
             if (isClear) {
+              map[index]=CELL_TYPE.GROUND
               cell.style.backgroundColor = "white"
-            }else{
-              cell.style.backgroundColor="black"
+            } else {
+              map[index]=CELL_TYPE.WALL
+              cell.style.backgroundColor = "black"
             }
           }
         })
@@ -95,25 +104,30 @@
     }
   }
 
-  function path(map,start,end){
-    const queue=[start]
-    function insert(x,y){
-      if(x<0||x>=100||y<0||y>=100) return
-      if(map[getIndex(x,y)]===CELL_TYPE.GROUND){
-        map[getIndex(x,y)]=CELL_TYPE.WALK
-        queue.push([x,y])
+  async function path(map, start, end) {
+    const queue = [start]
+
+    async function insert(x, y) {
+      if (x < 0 || x >= 100 || y < 0 || y >= 100) return
+      const index = getIndex(x, y)
+      if (map[index] === CELL_TYPE.GROUND) {
+        map[index] = CELL_TYPE.WALK
+        container.children[index].style.backgroundColor = "lightgreen"
+        queue.push([x, y])
+        await sleep(10)
       }
     }
 
-    while(queue.length){
-      const [x,y]=queue.shift()
-      console.log(x, y);
-      if(x===end[0]&&y===end[1])return true
-      insert(x-1,y)
-      insert(x+1,y)
-      insert(x,y-1)
-      insert(x,y+1)
+    while (queue.length) {
+      const [x, y] = queue.shift()
+      // console.log(x, y);
+      if (x === end[0] && y === end[1]) return true
+      await insert(x - 1, y)
+      await insert(x + 1, y)
+      await insert(x, y - 1)
+      await insert(x, y + 1)
     }
+    return false
   }
 
   initMap()
