@@ -14,7 +14,7 @@
       }
 
       .container {
-          width:600px;
+          width: 600px;
           display: flex;
           flex-wrap: wrap;
       }
@@ -28,11 +28,11 @@
   // config
   const SIZE = 100
   const CELL_TYPE = {
-    WALK:2,
+    WALK: 2,
     WALL: 1,
     GROUND: 0,
   }
-  const map = localStorage["map"]?JSON.parse(localStorage["map"]):Array(SIZE*SIZE).fill(CELL_TYPE.GROUND)
+  const map = localStorage["map"] ? JSON.parse(localStorage["map"]) : Array(SIZE * SIZE).fill(CELL_TYPE.GROUND)
 
   // helper
   function getElement(id) {
@@ -55,16 +55,16 @@
 
   // 編輯器操作狀態
   let isMouseDown = false
-  document.addEventListener("mouseup",()=>{
-    isMouseDown=false
+  document.addEventListener("mouseup", () => {
+    isMouseDown = false
   })
 
-  let isClear=false
-  document.addEventListener("mousedown",e=>{
-    isMouseDown=true
-    isClear= e.which===3
+  let isClear = false
+  document.addEventListener("mousedown", e => {
+    isMouseDown = true
+    isClear = e.which === 3
   })
-  document.addEventListener("contextmenu",e=>{
+  document.addEventListener("contextmenu", e => {
     e.preventDefault()
   })
 
@@ -76,8 +76,8 @@
 
         if (map[getIndex(x, y)] === CELL_TYPE.WALL) {
           cell.style.backgroundColor = "black"
-        }else if(map[getIndex(x,y)]===CELL_TYPE.GROUND){
-          cell.style.backgroundColor="white"
+        } else if (map[getIndex(x, y)] === CELL_TYPE.GROUND) {
+          cell.style.backgroundColor = "white"
         }
 
         cell.addEventListener("mousemove", () => {
