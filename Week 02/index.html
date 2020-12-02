@@ -108,11 +108,9 @@
           if (isMouseDown) {
             const index=getIndex(x,y)
             if (isClear) {
-              map[index]=CELL_TYPE.GROUND
-              cell.style.backgroundColor = "white"
+              markPoint(map,index,CELL_TYPE.GROUND)
             } else {
-              map[index]=CELL_TYPE.WALL
-              cell.style.backgroundColor = "black"
+              markPoint(map,index,CELL_TYPE.WALL)
             }
           }
         })
@@ -130,8 +128,7 @@
       if (x < 0 || x >= 100 || y < 0 || y >= 100) return
       const index = getIndex(x, y)
       if (map[index] === CELL_TYPE.GROUND) {
-        map[index] = CELL_TYPE.WALK
-        container.children[index].style.backgroundColor = "lightgreen"
+        markPoint(map,index,CELL_TYPE.WALK)
         table[index]=pre
         queue.push([x, y])
         await sleep(10)
@@ -145,6 +142,8 @@
         while(x!=start[0]&&y!=start[1]){
           //path.push(map[index])
           [x,y]=table[getIndex(x,y)]
+          let index=getIndex(x,y)
+          markPoint(map,index,CELL_TYPE.PATH)
           await sleep(10)
           container.children[getIndex(x,y)].style.backgroundColor="purple"
         }
