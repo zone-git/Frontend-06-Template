@@ -45,9 +45,26 @@
     }
   })(100)
 
-  // 寫死 map 陣列
-  function getCellType(x, y) {
-    return map[getIndex(x, y)]
+  function markPoint(map,index,cellType){
+    map[index]=cellType
+    let color
+    switch(cellType){
+      case CELL_TYPE.GROUND:
+        color="white"
+        break
+      case CELL_TYPE.WALL:
+        color="black"
+        break
+      case CELL_TYPE.WALK:
+        color="lightgreen"
+        break
+      case CELL_TYPE.PATH:
+        color="purple"
+        break
+      default:
+        break
+    }
+    container.children[index].style.backgroundColor=color
   }
 
   function sleep(delay) {
