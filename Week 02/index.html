@@ -140,7 +140,7 @@
       let [x, y] = queue.shift()
       if (x === end[0] && y === end[1]) {
         const path=[]
-        while(x!=start[0]&&y!=start[1]){
+        while(!(x===start[0]&&y===start[1])){
           let index=getIndex(x,y)
           markPoint(map,index,CELL_TYPE.PATH)
           path.push(table[index])
