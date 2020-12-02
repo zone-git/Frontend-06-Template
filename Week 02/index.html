@@ -141,9 +141,10 @@
         const path=[]
         while(x!=start[0]&&y!=start[1]){
           //path.push(map[index])
-          [x,y]=table[getIndex(x,y)]
           let index=getIndex(x,y)
           markPoint(map,index,CELL_TYPE.PATH)
+          x=table[index][0]
+          y=table[index][1]
           await sleep(10)
         }
         return path
