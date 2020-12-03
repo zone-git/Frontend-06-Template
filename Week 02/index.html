@@ -42,7 +42,7 @@
         }
       }
 
-      this.data[minIndex]=this.data[-1]
+      this.data[minIndex]=this.data[this.data.length-1]
       this.data.pop()
       return min
     }
