@@ -156,7 +156,7 @@
   }
 
   async function findPath(map, start, end) {
-    const queue = []
+    const queue = new Sorted([start],(a,b)=>distance(a,end)-distance(b,end))
     const table=Object.create(map)
 
     async function insert(x, y,pre) {
@@ -165,14 +165,14 @@
       if (map[index] === CELL_TYPE.GROUND) {
         markPoint(map,index,CELL_TYPE.WALK)
         table[index]=pre
-        queue.push([x, y])
+        queue.give([x, y])
         await sleep(10)
       }
     }
 
     await insert(start[0],start[1],start)
     while (queue.length) {
-      let [x, y] = queue.shift()
+      let [x, y] = queue.take()
       if (x === end[0] && y === end[1]) {
         const path=[]
         while(!(x===start[0]&&y===start[1])){
