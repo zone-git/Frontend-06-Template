@@ -25,6 +25,31 @@
 <div class="container" id="container"></div>
 <button id="btn">Save</button>
 <script>
+  class Sorted{
+    constructor(data, compare) {
+      this.data=data.slice()
+      this.compare=compare||((a,b)=>a-b)
+    }
+    take(){
+      if(!this.data.length)return
+
+      let min=this.data[0]
+      let minIndex=0
+      for(let i=1;i<this.data.length;i++){
+        if(this.compare(this.data[i],min)<0){
+          min=this.data[i]
+          minIndex=i
+        }
+      }
+
+      this.data[minIndex]=this.data[-1]
+      this.data.pop()
+      return min
+    }
+    give(x){
+      this.data.push(x)
+    }
+  }
   // config
   const SIZE = 100
   const CELL_TYPE = {
