@@ -103,6 +103,9 @@
   }
 
   const saveBtn = getElement("btn")
+  saveBtn.addEventListener("click",()=>{
+    localStorage["map"]=JSON.stringify(map)
+  })
   const container = getElement("container")
 
   // 編輯器操作狀態
