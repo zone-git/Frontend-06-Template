@@ -6,8 +6,18 @@
 </head>
 <body>
 <script>
+  //======================
+  //        詞法分析
+  //======================
+  const CONST={
+    NUMBER:"NUMBER",
+    WHITE_SPACE:"WHITE_SPACE",
+    LINE_TERMINATOR:"LINE_TERMINATOR",
+    EOF:"EOF",
+    MULTIPLICATIVE_EXPRESION:"MULTIPLICATIVE_EXPRESION"
+  }
   const regexp = /([0-9\.]+)|([ \t]+)|([\r\n]+)|(\*)|(\/)|(\+)|(\-)/g
-  const dictionary=["number", "whitespace","LineTerminator","*","/","+","-"]
+  const dictionary=[CONST.NUMBER, CONST.WHITE_SPACE,CONST.LINE_TERMINATOR,"*","/","+","-"]
 
   function* tokenize(source){
     let result=null
@@ -31,15 +41,64 @@
       yield token
     }
     yield {
-      type: "EOF",
+      type: CONST.EOF,
       value: null
     }
   }
 
-  for(let token of tokenize("1024 * 25")){
-    console.log(token)
+  //====================
+  //       語法分析
+  //====================
+  function MultiplicativeExpression(source){
+    let node
+    switch(true){
+      case source[0].type === CONST.NUMBER:
+        node={
+          type:CONST.MULTIPLICATIVE_EXPRESION,
+          children:[source[0]]
+        }
+        source[0]=node
+        break
+      case source[0].type===CONST.MULTIPLICATIVE_EXPRESION && source[1].type==="*":
+        node={
+          type:CONST.MULTIPLICATIVE_EXPRESION,
+          operator:"*",
+          children:[],
+        }
+        node.children.push(source.shift())
+        node.children.push(source.shift())
+        node.children.push(source.shift())
+        source.unshift(node)
+        break
+      case source[0].type===CONST.MULTIPLICATIVE_EXPRESION && source[1].type==="/":
+        node={
+          type:CONST.MULTIPLICATIVE_EXPRESION,
+          operator:"/",
+          children:[],
+        }
+        node.children.push(source.shift())
+        node.children.push(source.shift())
+        node.children.push(source.shift())
+        source.unshift(node)
+        break
+      case source[0].type===CONST.MULTIPLICATIVE_EXPRESION:
+        // end recursion
+        return source[0]
+        break
+    }
+    return MultiplicativeExpression(source)
   }
 
+  //=================
+  //  實際使用
+  //=================
+  const source=[]
+  for(let token of tokenize("10 * 25 / 2")){
+    if(token.type!==CONST.WHITE_SPACE&&token.type!==CONST.LINE_TERMINATOR)
+      source.push(token)
+  }
+
+  console.log(MultiplicativeExpression(source));
 </script>
 </body>
 </html>
