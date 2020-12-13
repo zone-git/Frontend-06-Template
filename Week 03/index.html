@@ -14,8 +14,8 @@
     WHITE_SPACE:"WHITE_SPACE",
     LINE_TERMINATOR:"LINE_TERMINATOR",
     EOF:"EOF",
-    MULTIPLICATIVE_EXPRESION:"MULTIPLICATIVE_EXPRESION",
-    ADDITIVE_EXPRESION:"ADDITIVE_EXPRESION",
+    M_EXPRESION:"MULTIPLICATIVE_EXPRESION",
+    A_EXPRESION:"ADDITIVE_EXPRESION",
     EXPRESSION:"Expression",
     MULTIPLE:"*",
     DIVIDE:"/",
@@ -72,7 +72,7 @@
     }
     node.children.push(source.shift())
     node.children.push(source.shift())
-    if(type===TYPE.ADDITIVE_EXPRESION){
+    if(type===TYPE.A_EXPRESION){
       MultiplicativeExpression(source)
     }
     node.children.push(source.shift())
@@ -84,16 +84,16 @@
     switch(true){
       case source[0].type === TYPE.NUMBER:
         node={
-          type:TYPE.MULTIPLICATIVE_EXPRESION,
+          type:TYPE.M_EXPRESION,
           children:[source[0]]
         }
         source[0]=node
         break
-      case source[0].type===TYPE.MULTIPLICATIVE_EXPRESION && source[1].type===TYPE.MULTIPLE:
-      case source[0].type===TYPE.MULTIPLICATIVE_EXPRESION && source[1].type===TYPE.DIVIDE:
-        reduceOperation(source,TYPE.MULTIPLICATIVE_EXPRESION, source[1].type)
+      case source[0].type===TYPE.M_EXPRESION && source[1].type===TYPE.MULTIPLE:
+      case source[0].type===TYPE.M_EXPRESION && source[1].type===TYPE.DIVIDE:
+        reduceOperation(source,TYPE.M_EXPRESION, source[1].type)
         break
-      case source[0].type===TYPE.MULTIPLICATIVE_EXPRESION:
+      case source[0].type===TYPE.M_EXPRESION:
         // end recursion
         return source
         break
@@ -104,18 +104,18 @@
   function AdditiveExpression(source){
     let node
     switch(true){
-      case source[0].type===TYPE.MULTIPLICATIVE_EXPRESION:
+      case source[0].type===TYPE.M_EXPRESION:
         node={
-          type:TYPE.ADDITIVE_EXPRESION,
+          type:TYPE.A_EXPRESION,
           children:[source[0]]
         }
         source[0]=node
         break
-      case source[0].type===TYPE.ADDITIVE_EXPRESION&&source[1].type===TYPE.PLUS:
-      case source[0].type===TYPE.ADDITIVE_EXPRESION&&source[1].type===TYPE.MINUS:
-        reduceOperation(source, TYPE.ADDITIVE_EXPRESION,source[1].type)
+      case source[0].type===TYPE.A_EXPRESION&&source[1].type===TYPE.PLUS:
+      case source[0].type===TYPE.A_EXPRESION&&source[1].type===TYPE.MINUS:
+        reduceOperation(source, TYPE.A_EXPRESION,source[1].type)
         break
-      case source[0].type===TYPE.ADDITIVE_EXPRESION:
+      case source[0].type===TYPE.A_EXPRESION:
         // end: there's no other thing need to check
         return source
       default:
@@ -127,7 +127,7 @@
   }
 
   function Expression(tokens){
-    if(tokens[0].type===TYPE.ADDITIVE_EXPRESION&&tokens[1]&&tokens[1].type===TYPE.EOF){
+    if(tokens[0].type===TYPE.A_EXPRESION&&tokens[1]&&tokens[1].type===TYPE.EOF){
       return {
         type: TYPE.EXPRESSION,
         children: tokens
