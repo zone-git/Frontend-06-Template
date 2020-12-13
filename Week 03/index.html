@@ -9,15 +9,21 @@
   //======================
   //        詞法分析
   //======================
-  const CONST={
+  const TYPE={
     NUMBER:"NUMBER",
     WHITE_SPACE:"WHITE_SPACE",
     LINE_TERMINATOR:"LINE_TERMINATOR",
     EOF:"EOF",
-    MULTIPLICATIVE_EXPRESION:"MULTIPLICATIVE_EXPRESION"
+    MULTIPLICATIVE_EXPRESION:"MULTIPLICATIVE_EXPRESION",
+    ADDITIVE_EXPRESION:"ADDITIVE_EXPRESION",
+    EXPRESSION:"Expression",
+    MULTIPLE:"*",
+    DIVIDE:"/",
+    PLUS:"+",
+    MINUS:"-"
   }
   const regexp = /([0-9\.]+)|([ \t]+)|([\r\n]+)|(\*)|(\/)|(\+)|(\-)/g
-  const dictionary=[CONST.NUMBER, CONST.WHITE_SPACE,CONST.LINE_TERMINATOR,"*","/","+","-"]
+  const dictionary=[TYPE.NUMBER, TYPE.WHITE_SPACE,TYPE.LINE_TERMINATOR,TYPE.MULTIPLE,TYPE.DIVIDE,TYPE.PLUS,TYPE.MINUS]
 
   function* tokenize(source){
     let result=null
@@ -41,64 +47,100 @@
       yield token
     }
     yield {
-      type: CONST.EOF,
+      type: TYPE.EOF,
       value: null
     }
+  }
+
+  function getTokens(str){
+    const source=[]
+    for(let token of tokenize(str)){
+      if(token.type!==TYPE.WHITE_SPACE&&token.type!==TYPE.LINE_TERMINATOR)
+        source.push(token)
+    }
+    return source
   }
 
   //====================
   //       語法分析
   //====================
+  function reduceOperation(source, type, operator){
+    const node={
+      type,
+      operator,
+      children:[],
+    }
+    node.children.push(source.shift())
+    node.children.push(source.shift())
+    if(type===TYPE.ADDITIVE_EXPRESION){
+      MultiplicativeExpression(source)
+    }
+    node.children.push(source.shift())
+    source.unshift(node)
+  }
+
   function MultiplicativeExpression(source){
     let node
     switch(true){
-      case source[0].type === CONST.NUMBER:
+      case source[0].type === TYPE.NUMBER:
         node={
-          type:CONST.MULTIPLICATIVE_EXPRESION,
+          type:TYPE.MULTIPLICATIVE_EXPRESION,
           children:[source[0]]
         }
         source[0]=node
         break
-      case source[0].type===CONST.MULTIPLICATIVE_EXPRESION && source[1].type==="*":
-        node={
-          type:CONST.MULTIPLICATIVE_EXPRESION,
-          operator:"*",
-          children:[],
-        }
-        node.children.push(source.shift())
-        node.children.push(source.shift())
-        node.children.push(source.shift())
-        source.unshift(node)
+      case source[0].type===TYPE.MULTIPLICATIVE_EXPRESION && source[1].type===TYPE.MULTIPLE:
+      case source[0].type===TYPE.MULTIPLICATIVE_EXPRESION && source[1].type===TYPE.DIVIDE:
+        reduceOperation(source,TYPE.MULTIPLICATIVE_EXPRESION, source[1].type)
         break
-      case source[0].type===CONST.MULTIPLICATIVE_EXPRESION && source[1].type==="/":
-        node={
-          type:CONST.MULTIPLICATIVE_EXPRESION,
-          operator:"/",
-          children:[],
-        }
-        node.children.push(source.shift())
-        node.children.push(source.shift())
-        node.children.push(source.shift())
-        source.unshift(node)
-        break
-      case source[0].type===CONST.MULTIPLICATIVE_EXPRESION:
+      case source[0].type===TYPE.MULTIPLICATIVE_EXPRESION:
         // end recursion
-        return source[0]
+        return source
         break
     }
     return MultiplicativeExpression(source)
   }
 
+  function AdditiveExpression(source){
+    let node
+    switch(true){
+      case source[0].type===TYPE.MULTIPLICATIVE_EXPRESION:
+        node={
+          type:TYPE.ADDITIVE_EXPRESION,
+          children:[source[0]]
+        }
+        source[0]=node
+        break
+      case source[0].type===TYPE.ADDITIVE_EXPRESION&&source[1].type===TYPE.PLUS:
+      case source[0].type===TYPE.ADDITIVE_EXPRESION&&source[1].type===TYPE.MINUS:
+        reduceOperation(source, TYPE.ADDITIVE_EXPRESION,source[1].type)
+        break
+      case source[0].type===TYPE.ADDITIVE_EXPRESION:
+        // end: there's no other thing need to check
+        return source
+      default:
+        // extract multiplicative expression at beginning
+        MultiplicativeExpression(source)
+        break
+    }
+    return AdditiveExpression(source)
+  }
+
+  function Expression(tokens){
+    if(tokens[0].type===TYPE.ADDITIVE_EXPRESION&&tokens[1]&&tokens[1].type===TYPE.EOF){
+      return {
+        type: TYPE.EXPRESSION,
+        children: tokens
+      }
+    }
+    AdditiveExpression(tokens)
+    return Expression(tokens)
+  }
+
   //=================
   //  實際使用
   //=================
-  const source=[]
-  for(let token of tokenize("10 * 25 / 2")){
-    if(token.type!==CONST.WHITE_SPACE&&token.type!==CONST.LINE_TERMINATOR)
-      source.push(token)
-  }
-
-  console.log(MultiplicativeExpression(source));
+  console.log(Expression(getTokens("10+3*5")));
 </script>
 </body>
 </html>
